@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raindrop</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Gorditas&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="game">
+        <audio class="audio_bg" src="./sounds/background.wav" loop></audio>
+        <div class="rain">
+            <div class="drop"></div>
+            <div class="drop"></div>
+            <div class="drop"></div>
+            <div class="drop"></div>
+        </div>
+        <div class="stone"></div>
+        <div class="sea">
+            <div class="wave wave_bottom"></div>
+            <div class="wave wave_middle"></div>
+            <div class="wave wave_top"></div>
+        </div>
+        <div class="modal"></div>
+
+    </div>
+
+    <div class="controls">
+        <div class="controls__button">
+            <button class="play" type="button">Play</button>
+            <button class="rules" type="button">How to play</button>
+        </div>
+        <h1>Score <span class="score">0</span></h1>
+        <div class="settings">
+            <div class="operations"></div>
+            <div class="range">
+                <p>Set up the interval of numbers</p>
+                <div class="range__base">
+                    <div class="range__fill">50</div>
+                </div>
+            </div>
+
+        </div>
+        <div class="display"></div>
+        <div class="answer__buttons">
+        <audio class="audio_crush" src="./sounds/cartoon015.mp3"></audio>
+        <audio class="audio_lost" src="./sounds/cartoon004.mp3"></audio>
+
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+</body>
+
+</html>
