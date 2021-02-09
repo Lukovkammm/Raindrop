@@ -4,23 +4,23 @@ const rangeBase = document.querySelector('.range__base');
 const rangeFill = document.querySelector('.range__fill');
 const operationsContainer = document.querySelector('.operations');
 const play = document.querySelector('.play');
-const drops = document.querySelectorAll('.drop');
+const drop = document.querySelector('.drop');
+const dropLucky = document.querySelector('.drop_lucky');
 const score = document.querySelector('.score');
 const sea = document.querySelector('.sea');
 const modal = document.querySelector('.modal');
+const modalRules = document.querySelector('.modal_rules');
 const rules = document.querySelector('.rules');
 const bgAudio = document.querySelector('.audio_bg');
 const crushAudio = document.querySelector('.audio_crush');
 const lostAudio = document.querySelector('.audio_lost');
 
-let lastDrop;
 let operations = ['+'];
-let rightAnswers = [];
-let liveDropsSum = [];
-let liveDropsNode = [];
+let rightAnswer = 0;
+let rightLuckyAnswer = 0;
 let height = 100;
 
-let timeUp = false;
+let youLose = false;
 let allActive = false;
 
 const operationsData = [{
@@ -44,6 +44,7 @@ const operationButtons = operationsData.reduce((acc, item) => {
     return acc + `<button data-operation="${item.data}" class="operation">${item.content}</button>`
 }, '');
 operationsContainer.innerHTML = operationButtons;
+operationsContainer.firstElementChild.classList.add('operation_active');
 
 function changeNumberRange(e) {
     let length = rangeBase.offsetWidth;
@@ -59,8 +60,6 @@ function getRandomNumber() {
     let randomNumberSecond = Math.ceil(Math.random() * randomNumberFirst);
     return [randomNumberFirst, randomNumberSecond];
 }
-
-operationsContainer.firstElementChild.classList.add('operation_active');
 
 function chooseOperation(e) {
     if (e.target.classList.contains('operation')) {
@@ -93,69 +92,80 @@ function getRandomOperation() {
     return randomOperation;
 }
 
-let dropIndex = 0;
-
-function getDrop() {
+function getDropPosition() {
     let randomPosition = Math.ceil(Math.random() * (90 - 10) + 10);
-    let drop = drops[dropIndex];
-    dropIndex++;
-    if (dropIndex >= drops.length) dropIndex = 0;
-    return [drop, randomPosition];
+    return randomPosition;
 }
 
 function generateTask() {
     let randomNumbers = getRandomNumber();
     let randomOperation = getRandomOperation();
-    let drop = getDrop();
+    if (randomOperation === '/') {
+        if (randomNumbers[0] % randomNumbers[1] !== 0) {
+            generateTask();
+        }
+    }
+    return [randomNumbers, randomOperation];
+}
 
-    drop[0].innerHTML = `
-        <span class="task task__number_first">${randomNumbers[0]}</span>
-        <span class="task task__operator">${randomOperation}</span>
-        <span class="task task__number_second">${randomNumbers[1]}</span>`;
-    drop[0].style.left = `${drop[1]}%`
-    const rightAnswer = eval(`${randomNumbers[0]}${randomOperation}${randomNumbers[1]}`);
-    rightAnswers.push(rightAnswer);
-    return [drop[0], rightAnswer];
+function generateDrop() {
+    let randoms = generateTask();
+    drop.innerHTML = `
+        <span class="task task__number_first">${randoms[0][0]}</span>
+        <span class="task task__operator">${randoms[1]}</span>
+        <span class="task task__number_second">${randoms[0][1]}</span>`;
+    rightAnswer = eval(`${randoms[0][0]}${randoms[1]}${randoms[0][1]}`);
+    return drop;
+}
+
+function generateLuckyDrop() {
+    let randoms = generateTask();
+    dropLucky.innerHTML = `
+    <span class="task task__number_first">${randoms[0][0]}</span>
+    <span class="task task__operator">${randoms[1]}</span>
+    <span class="task task__number_second">${randoms[0][1]}</span>`;
+    rightLuckyAnswer = eval(`${randoms[0][0]}${randoms[1]}${randoms[0][1]}`);
+    return dropLucky;
 }
 
 const answerKeys = [{
-    key: 55,
+    key: 55 || 36,
     content: '7',
     class: 'number'
 }, {
-    key: 56,
+    key: 56 || 38,
     content: '8',
     class: 'number'
 }, {
-    key: 57,
+    key: 57 || 33,
     content: '9',
     class: 'number'
 }, {
-    key: 52,
+    key: 52 || 37,
     content: '4',
     class: 'number'
 }, {
-    key: 53,
+    key: 53 || 12,
     content: '5',
     class: 'number'
 }, {
-    key: 54,
+    key: 54 || 39,
     content: '6',
     class: 'number'
 }, {
-    key: 49,
+    key: 49 || 35,
     content: '1',
     class: 'number'
 }, {
-    key: 50,
+    key: 50 || 40,
     content: '2',
     class: 'number'
 }, {
-    key: 51,
+    key: 51 || 34,
     content: '3',
     class: 'number'
 }, {
-    key: 48,
+    key: 48 || 45,
     content: '0',
     class: 'number'
 }, {
@@ -179,7 +189,7 @@ const content = answerKeys.reduce((acc, item) => {
 answerButtons.innerHTML = content;
 
 function clickOnDisplay(e) {
-    let button = e.target;
+    const button = e.target;
     showOnDisplay(button);
 }
 
@@ -206,65 +216,112 @@ function showOnDisplay(button) {
     }
 }
 
+let timer;
+let autoTimer;
+let transitionTime = 3;
+let dropCounter = 0;
+
+
 function startGame() {
+    youLose = false;
     height = 100;
+    dropCounter = 0;
+    transitionTime = 3;
+
     sea.style.cssText = `height: ${height}px; transition: all .3s linear;`;
     modal.classList.remove('modal_show');
     score.textContent = '0';
-    rightAnswers = [];
-
-    // bgAudio.play();
-
 
     startRain();
-    setInterval(() => {
-        if (!timeUp) startRain();
-        if (timeUp) stopGame();
-    }, 3000);
-
-    setTimeout(() => {
-        timeUp = true;
-        stopGame();
-    }, 20000);
-    timeUp = false;
 }
 
 function startRain() {
-    const drop = generateTask();
-    liveDropsSum.push(drop[1]);
-    liveDropsNode.push(drop[0]);
-    drop[0].classList.add('drop_active');
-    setTimeout(() => {
-        drop[0].classList.remove('drop_active');
-    }, 3000);
+    const dropPosition = getDropPosition();
+    const drop = generateDrop();
+    const dropLucky = generateLuckyDrop();
+    if (drop.style.transition) {
+        drop.style.cssText = '';
+        seaUp();
+        lostAudio.play();
+    } else if (dropLucky.style.transition) {
+        dropLucky.style.cssText = '';
+        seaUp();
+        lostAudio.play();
+    } else {
+        drop.style.cssText = `top: 95%; left: ${dropPosition}%; opacity: 1; transition: top ${transitionTime}s linear;`;
+        dropCounter++;
+    }
 
+    clearInterval(timer);
+    timer = setInterval(() => {
+        if (!youLose) startRain();
+        if (dropCounter === 3) {
+            setTimeout(() => {
+                generateLuckyDrop();
+                dropLucky.style.cssText = `top: 125%; left: ${dropPosition}%; opacity: 1; transition: top ${transitionTime}s linear;`;
+                dropCounter = 0;
+                transitionTime -= 0.5;
+            }, 1000);
+        }
+    }, (transitionTime * 1000));
+}
+
+function playGameAuto() {
+    startGame();
+    clearInterval(autoTimer);
+    autoTimer = setInterval(() => {
+        if (!youLose) {
+            modalRules.classList.add('modal_show');
+            display.textContent = rightAnswer;
+            let result = rightAnswer;
+            checkAnswer(result);
+
+            setTimeout(() => {
+                display.textContent = '';
+                modalRules.classList.remove('modal_show');
+            }, 1000);
+        }
+    }, ((2 * (transitionTime * 1000)) + 800));
 }
 
 function checkAnswer(result) {
-    liveDropsSum.forEach((sum, index) => {
-        if (sum === +result) {
-            crushAudio.play();
-            liveDropsNode[index].classList.remove('drop_active');
-            liveDropsNode[index].innerHTML = '';
-            liveDropsSum.splice(index, 1);
-            liveDropsNode.splice(index, 1);
-            let scoreValue = +score.textContent;
-            scoreValue += 5;
-            score.textContent = scoreValue;
-            let i = rightAnswers.indexOf(+result);
-            delete rightAnswers[i];
-        } else {
-            liveDropsNode[index].classList.remove('drop_active');
-            liveDropsNode[index].innerHTML = '';
-            liveDropsSum.splice(index, 1);
-            liveDropsNode.splice(index, 1);
+    if (rightAnswer === +result || rightLuckyAnswer === +result) {
+        crushAudio.play();
+        if (rightAnswer) {
+            rightAnswer = 0;
+            drop.classList.add('drop_crushed');
+            drop.innerHTML = '';
+            setTimeout(() => {
+                drop.style.cssText = '';
+                drop.classList.remove('drop_crushed');
+            }, 100);
+        } else if (rightLuckyAnswer) {
+            rightLuckyAnswer = 0;
+            dropLucky.classList.add('drop-lucky_crushed');
+            dropLucky.innerHTML = '';
+            setTimeout(() => {
+                dropLucky.style.cssText = '';
+                dropLucky.classList.remove('drop-lucky_crushed');
+            }, 100);
+        }
+        let scoreValue = +score.textContent;
+        scoreValue += 5;
+        score.textContent = scoreValue;
+    } else {
+        if (rightAnswer) {
+            lostAudio.play();
+            drop.style.cssText = '';
+            seaUp();
+        } else if (rightLuckyAnswer) {
+            lostAudio.play();
+            dropLucky.style.cssText = '';
             seaUp();
         }
-    })
+    }
 }
 
+
 function seaUp() {
-    lostAudio.play();
     if (height === 250) {
         stopGame();
     }
@@ -273,27 +330,18 @@ function seaUp() {
 }
 
 function stopGame() {
-    timeUp = true;
-    bgAudio.pause();
-    let crushedDrops = rightAnswers.length - rightAnswers.filter(drop => drop).length;
+    youLose = true;
     modal.classList.add('modal_show');
+    modalRules.classList.remove('modal_show');
+
     modal.innerHTML = `
             <h2>Game over</h2>
             <span>Total score: ${score.textContent}</span>
-            <span>Total drops: ${rightAnswers.length}</span>
-            <span>Crushed drops: ${crushedDrops}</span>`
+            <span>Crushed drops: ${+(score.textContent) / 5}</span>`
 }
-
-function playGameAuto() {
-    startGame();
-    let drop = generateTask();
-    
-}
-
-
-
 
 play.addEventListener('click', startGame);
+rules.addEventListener('click', playGameAuto);
 operationsContainer.addEventListener('click', chooseOperation);
 answerButtons.addEventListener('click', clickOnDisplay);
 rangeBase.addEventListener('mousedown', () => {
@@ -303,5 +351,4 @@ rangeBase.addEventListener('mouseup', () => {
     rangeBase.removeEventListener('mousemove', changeNumberRange);
 });
 rangeBase.addEventListener('click', changeNumberRange);
-rules.addEventListener('click', playGameAuto);
 window.addEventListener('keydown', clickOnKeyboard);

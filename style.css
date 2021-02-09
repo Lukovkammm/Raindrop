@@ -1,3 +1,7 @@
+html {
+    box-sizing: border-box;
+}
+
 body {
     display: grid;
     grid-template-columns: 1fr 350px;
@@ -49,16 +53,27 @@ body {
 .drop span {
     position: absolute;
     font-size: 25px;
+
+}
+
+.drop_lucky {
+    background-image: url(./assets/luckyDrop.png);
 }
 
 .drop_active {
-    top: 110%;
+    top: 95%;
     opacity: 1;
-    transition: top 7s ease;
+    transition: top 3s linear;
 }
 
 .drop_crushed {
     background-image: url(./assets/crush.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.drop-lucky_crushed {
+    background-image: url(./assets/luckyCrush.png);
     background-repeat: no-repeat;
     background-size: contain;
 }
@@ -69,12 +84,12 @@ body {
 }
 
 .task__number_first {
-    right: 25%;
+    right: 28%;
     top: 40%;
 }
 
 .task__number_second {
-    right: 25%;
+    right: 28%;
     bottom: 15%;
 }
 
@@ -118,7 +133,15 @@ body {
 }
 
 h1 {
-    margin: 15px 0 0;
+    margin: 0;
+    font-size: 55px;
+    color: #F2C15E;
+    text-shadow: 6px 0px #333;
+}
+
+h2 {
+    margin: 0;
+    margin-bottom: 15px;
 }
 
 .settings {
@@ -176,7 +199,7 @@ h1 {
     width: 50%;
     height: 24px;
     border-radius: 35px;
-    background-color:  #F2C15E;
+    background-color: #F2C15E;
 }
 
 .controls {
@@ -186,13 +209,6 @@ h1 {
     justify-content: space-between;
     padding: 20px 0;
     background-color: rgba(242, 155, 143, .7);
-}
-
-h1 {
-    margin: 0;
-    font-size: 55px;
-    color: #F2C15E;
-    text-shadow: 6px 0px #333;
 }
 
 .answer__buttons {
@@ -208,18 +224,22 @@ h1 {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    width: 80%;
+    width: 90%%;
     height: 60px;
     padding: 0px 10px;
+    margin-bottom: 20px;
     font-size: 40px;
     background-color: #fff;
     border: 3px solid #F2C15E;
     border-radius: 35px;
 }
 
-.play, .rules,
-.number, .clear, 
-.delete, .enter {
+.play,
+.rules,
+.number,
+.clear,
+.delete,
+.enter {
     font-family: inherit;
     font-size: 25px;
     background-color: #fff;
@@ -245,7 +265,8 @@ button:hover {
     flex-direction: column;
 }
 
-.play, .rules {
+.play,
+.rules {
     width: 260px;
     height: 60px;
     margin-bottom: 25px;
@@ -259,18 +280,55 @@ button:hover {
     display: none;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     width: 30%;
-    min-width: 300px;
-    min-width: 300px;
-    height: 300px;
-    padding: 20px 30px;
+    min-width: 280px;
+    max-width: 300px;
+    height: 170px;
+    padding: 30px;
     font-size: 30px;
     border: #ffffff solid 3px;
-    border-radius: 15%;
+    border-radius: 35px;
     background-color: #F2C15E;
     box-shadow: 6px 0px #333333;
+    opacity: 0;
+}
+
+.modal_rules::before {
+    content: '';
+    position: absolute;
+    top: -75%;
+    right: -100px;
+    width: 105px;
+    height: inherit;
+    background-image: url(./assets/arrow.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.modal_rules {
+    position: absolute;
+    top: 55%;
+    right: 400px;
+    width: 150px;
+    height: 50px;
+    padding: 10px 15px;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    border: 3px solid #ffffff;
+    border-radius: 30px;
+    background-color: #F2C15E;
+    opacity: 0;
+    
 }
 
 .modal_show {
     display: flex;
+    opacity: 1;
+    transition: opacity 1s ease-in-out;
+
 }
