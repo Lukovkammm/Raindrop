@@ -227,6 +227,8 @@ function startGame() {
     height = 100;
     dropCounter = 0;
     transitionTime = 3;
+    clearInterval(autoTimer);
+
 
     sea.style.cssText = `height: ${height}px; transition: all .3s linear;`;
     modal.classList.remove('modal_show');
@@ -281,7 +283,7 @@ function playGameAuto() {
                 modalRules.classList.remove('modal_show');
             }, 1000);
         }
-    }, ((2 * (transitionTime * 1000)) + 800));
+    }, ((2 * (transitionTime * 1000)) + 500));
 }
 
 function checkAnswer(result) {
