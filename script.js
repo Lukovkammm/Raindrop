@@ -215,6 +215,7 @@ function showOnDisplay(button) {
             display.textContent += button.textContent;
         }
     }
+   }
 }
 
 let timer;
