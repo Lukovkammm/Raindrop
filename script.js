@@ -199,7 +199,8 @@ function clickOnKeyboard(e) {
 }
 
 function showOnDisplay(button) {
-    if (button.classList.contains('enter')) {
+   if (button) {
+        if (button.classList.contains('enter')) {
         let result = display.textContent;
         display.textContent = '';
         checkAnswer(result);
