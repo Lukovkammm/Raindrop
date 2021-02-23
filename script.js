@@ -199,6 +199,8 @@ function clickOnKeyboard(e) {
 }
 
 function showOnDisplay(button) {
+    console.log(button);
+    if (button) {
         if (button.classList.contains('enter')) {
             let result = display.textContent;
             display.textContent = '';
@@ -214,6 +216,7 @@ function showOnDisplay(button) {
                 display.textContent += button.textContent;
             }
         }
+    }
 }
 
 let timer;
