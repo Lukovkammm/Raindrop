@@ -129,43 +129,43 @@ function generateLuckyDrop() {
 }
 
 const answerKeys = [{
-    key: 55 || 36,
+    key: 55,
     content: '7',
     class: 'number'
 }, {
-    key: 56 || 38,
+    key: 56,
     content: '8',
     class: 'number'
 }, {
-    key: 57 || 33,
+    key: 57,
     content: '9',
     class: 'number'
 }, {
-    key: 52 || 37,
+    key: 52,
     content: '4',
     class: 'number'
 }, {
-    key: 53 || 12,
+    key: 53,
     content: '5',
     class: 'number'
 }, {
-    key: 54 || 39,
+    key: 54,
     content: '6',
     class: 'number'
 }, {
-    key: 49 || 35,
+    key: 49,
     content: '1',
     class: 'number'
 }, {
-    key: 50 || 40,
+    key: 50,
     content: '2',
     class: 'number'
 }, {
-    key: 51 || 34,
+    key: 51,
     content: '3',
     class: 'number'
 }, {
-    key: 48 || 45,
+    key: 48,
     content: '0',
     class: 'number'
 }, {
@@ -199,21 +199,21 @@ function clickOnKeyboard(e) {
 }
 
 function showOnDisplay(button) {
-    if (button.classList.contains('enter')) {
-        let result = display.textContent;
-        display.textContent = '';
-        checkAnswer(result);
-    } else if (button.classList.contains('clear')) {
-        display.textContent = display.textContent.slice(0, length - 1);
-    } else if (button.classList.contains('delete')) {
-        display.textContent = '';
-    } else if (button.classList.contains('number')) {
-        if (display.textContent === '0') {
-            display.textContent = button.textContent;
-        } else {
-            display.textContent += button.textContent;
+        if (button.classList.contains('enter')) {
+            let result = display.textContent;
+            display.textContent = '';
+            checkAnswer(result);
+        } else if (button.classList.contains('clear')) {
+            display.textContent = display.textContent.slice(0, length - 1);
+        } else if (button.classList.contains('delete')) {
+            display.textContent = '';
+        } else if (button.classList.contains('number')) {
+            if (display.textContent === '0') {
+                display.textContent = button.textContent;
+            } else {
+                display.textContent += button.textContent;
+            }
         }
-    }
 }
 
 let timer;
@@ -228,7 +228,6 @@ function startGame() {
     dropCounter = 0;
     transitionTime = 3;
     clearInterval(autoTimer);
-
 
     sea.style.cssText = `height: ${height}px; transition: all .3s linear;`;
     modal.classList.remove('modal_show');
@@ -313,6 +312,7 @@ function checkAnswer(result) {
         if (rightAnswer) {
             lostAudio.play();
             drop.style.cssText = '';
+            startRain();
             seaUp();
         } else if (rightLuckyAnswer) {
             lostAudio.play();
